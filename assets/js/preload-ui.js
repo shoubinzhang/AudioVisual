@@ -33,4 +33,5 @@ contextBridge.exposeInMainWorld('voidAPI', {
   onUpdateError: (callback) => ipcRenderer.on('update-error', (event, ...args) => callback(...args)),
   closeWindow: () => ipcRenderer.send('close-window'),
   
+  
 });

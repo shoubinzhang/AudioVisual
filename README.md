@@ -1,8 +1,12 @@
+<div align="center">
+
 # 🎬 AudioVisual
+
+</div>
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-1.0.7-blue.svg?style=for-the-badge&logo=semantic-release)
+![Version](https://img.shields.io/badge/version-1.0.8-blue.svg?style=for-the-badge&logo=semantic-release)
 ![License](https://img.shields.io/badge/license-UNLICENSED-red.svg?style=for-the-badge)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg?style=for-the-badge)
 ![Electron](https://img.shields.io/badge/Electron-33+-47848F.svg?style=for-the-badge&logo=electron)
@@ -136,7 +140,11 @@ npm run dist
 
 ## 📝 更新日志
 
-### v1.0.7 (最新)
+### v1.0.8 (最新)
+- 🐛 修复爱奇艺黑屏问题
+- ✨ 添加窗口自适应
+
+### v1.0.7
 - 🔧 升级Electron到v33.0.0，支持最新Windows 25H2系统
 - 🛠️ 更新electron-builder到v25.1.8，提升构建稳定性
 - 🐛 修复Windows应用在新版本系统上无法运行的问题

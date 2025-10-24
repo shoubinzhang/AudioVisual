@@ -329,6 +329,7 @@ document.getElementById('7-movie-button').addEventListener('click', () => naviga
 document.getElementById('kanpian-button').addEventListener('click', () => navigateTo('https://kunzejiaoyu.net/'));
 document.getElementById('gazf-button').addEventListener('click', () => navigateTo('https://gaze.run/'));
 
+
 document.addEventListener('DOMContentLoaded', () => {
     const externalLink = document.querySelector('.footer a');
     if (externalLink) {
@@ -343,7 +344,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentNotificationTimeout = null;
     
     function showUpdateNotification(message, type = 'info', persistent = false) {
-        // 清除之前的定时器
         if (currentNotificationTimeout) {
             clearTimeout(currentNotificationTimeout);
             currentNotificationTimeout = null;
@@ -351,12 +351,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         updateNotificationArea.innerHTML = `<div style="padding: 8px; border-radius: 4px; font-size: 12px; text-align: center; background: ${type === 'error' ? '#ff6768' : type === 'success' ? 'var(--highlight-color)' : 'var(--accent-color)'}; color: ${type === 'success' ? 'var(--primary-bg)' : 'white'}; word-wrap: break-word; line-height: 1.3;">${message}</div>`;
         
-        // 只有非持久化的通知才会自动消失
         if (!persistent && type !== 'success' && type !== 'available') {
             currentNotificationTimeout = setTimeout(() => {
                 updateNotificationArea.innerHTML = '';
                 currentNotificationTimeout = null;
-            }, 8000); // 延长到8秒
+            }, 8000);
         }
     }
     
@@ -372,7 +371,6 @@ document.addEventListener('DOMContentLoaded', () => {
         notificationDiv.onclick = function() {
             showUpdateNotification("正在下载更新...", 'info', true);
             window.voidAPI.downloadUpdate();
-            // 移除点击事件
             const newDiv = updateNotificationArea.querySelector('div');
             if (newDiv) {
                 newDiv.onclick = null;
@@ -404,4 +402,34 @@ document.addEventListener('DOMContentLoaded', () => {
     window.voidAPI.onUpdateError((err) => {
         showUpdateNotification(`更新出错: ${err.message}`, 'error', false);
     });
+
+    // --- Sidebar Auto-Scaling Logic ---
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarScaler = document.querySelector('.sidebar-scaler');
+
+    if (sidebar && sidebarScaler) {
+        const updateSidebarScale = () => {
+            const idealHeight = sidebarScaler.scrollHeight;
+            const availableHeight = sidebar.clientHeight;
+            
+            const verticalPadding = parseFloat(getComputedStyle(sidebarScaler).paddingTop) + parseFloat(getComputedStyle(sidebarScaler).paddingBottom);
+            const effectiveAvailableHeight = availableHeight - verticalPadding;
+
+            // Add a small tolerance to prevent scaling for minor pixel differences
+            if (idealHeight > effectiveAvailableHeight + 2) { 
+                const scale = effectiveAvailableHeight / idealHeight;
+                sidebarScaler.style.transform = `scale(${scale})`;
+            } else {
+                sidebarScaler.style.transform = 'scale(1)';
+            }
+        };
+
+        const resizeObserver = new ResizeObserver(updateSidebarScale);
+        resizeObserver.observe(sidebar);
+        
+        const mutationObserver = new MutationObserver(updateSidebarScale);
+        mutationObserver.observe(sidebarScaler, { childList: true, subtree: true, attributes: true });
+
+        setTimeout(updateSidebarScale, 100);
+    }
 });

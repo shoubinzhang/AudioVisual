@@ -98,7 +98,7 @@
 
 /* --- Drama Mode Usage Tips --- */
 .drama-usage-tips {
-    margin-top: 25px;
+    margin-top: clamp(15px, 2.5vh, 25px);
     padding: 15px;
     background-color: var(--accent-color);
     border-radius: var(--border-radius);
@@ -107,7 +107,7 @@
 
 .drama-usage-tips h4 {
    color: var(--highlight-color);
-   font-size: 16px;
+   font-size: clamp(14px, 2vh, 16px);
    margin-bottom: 15px;
    text-align: center;
 }
@@ -118,7 +118,7 @@
 }
 
 .drama-usage-tips li {
-   font-size: 14px;
+   font-size: clamp(12px, 1.6vh, 14px);
    color: var(--text-secondary-color);
    margin-bottom: 12px;
    line-height: 1.6;

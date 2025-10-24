@@ -82,6 +82,22 @@ ipcRenderer.on('update-styles', (event, cssContent) => {
   applyStyles(cssContent);
 });
 
+// --- 主动式解析逻辑 ---
+// 监听点击事件，主动发现换集行为
+document.addEventListener('click', (event) => {
+    // 只在爱奇艺网站生效
+    if (window.location.hostname.includes('iqiyi.com')) {
+        const anchor = event.target.closest('a');
+        // 检查点击的是否是包含特定格式的视频链接
+        if (anchor && anchor.href && anchor.href.includes('iqiyi.com/v_')) {
+            console.log('[preload-web] Detected iQiyi episode click:', anchor.href);
+            // 立即通知主进程，这是最快的方式
+            ipcRenderer.send('proactive-parse-request', anchor.href);
+        }
+    }
+}, true); // 使用捕获阶段以最快速度拦截事件
+
+
 // --- DOM 监控 ---
 
 // 使用MutationObserver作为备用方案，确保在DOM动态变化时也能应用样式
