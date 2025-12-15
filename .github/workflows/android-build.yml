@@ -18,28 +18,25 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: "18"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
 
-      # 你的项目依赖里如果本来就有 @capacitor/cli/@capacitor/android，
-      # 也可以删掉这一步；保留它是为了保证 CI 一定有 cap 命令可用
-      - name: Install Capacitor CLI
-        run: npm install @capacitor/cli @capacitor/android
+      # 如果你的 package.json 里本来就有 @capacitor/cli/@capacitor/android，可删除这步
+      - name: Ensure Capacitor packages
+        run: npm install --no-save @capacitor/cli @capacitor/android
 
-      # 关键：在 CI 强制写入一个正确的 capacitor.config.json，避免任何来源的 webDir="."
+      # 关键：CI 强制写入正确配置，确保 webDir=www，且不含 bundledWebRuntime
       - name: Force Capacitor config for CI
         shell: bash
         run: |
           echo "PWD=$(pwd)"
           echo "SHA=$(git rev-parse HEAD)"
 
-          # 确保 www 存在
           test -d www && ls -la www | head || (echo "www missing" && exit 1)
 
-          # 生成（或覆盖）root capacitor.config.json，确保 webDir=www 且没有 bundledWebRuntime
           cat > capacitor.config.json <<'JSON'
           {
             "appId": "com.audiovisual.player",
@@ -53,21 +50,10 @@ jobs:
           echo "=== capacitor.config.json (CI) ==="
           cat capacitor.config.json
 
-          echo "=== capacitor.config.ts (repo) ==="
-          test -f capacitor.config.ts && sed -n '1,200p' capacitor.config.ts || true
-
-          echo "=== any capacitor.config.* (maxdepth 5) ==="
-          find . -maxdepth 5 -name "capacitor.config.*" -print
-
-          echo "=== grep bundledWebRuntime/webDir ==="
-          grep -RIn "bundledWebRuntime" . || true
-          grep -RIn "webDir" . || true
-
       - name: Clean Android folder if exists
         shell: bash
         run: |
           if [ -d android ]; then
-            echo "android/ exists, removing for clean add..."
             rm -rf android
           fi
 
@@ -85,26 +71,53 @@ jobs:
           ./gradlew assembleDebug
           ./gradlew assembleRelease
 
+      # PR 事件通常拿不到 secrets，所以不在 PR 上签名
+      - name: Check signing secrets present
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          if [ -z "${{ secrets.ANDROID_SIGNING_KEY }}" ]; then
+            echo "ANDROID_SIGNING_KEY is EMPTY"
+            exit 1
+          fi
+          if [ -z "${{ secrets.ANDROID_KEY_ALIAS }}" ]; then
+            echo "ANDROID_KEY_ALIAS is EMPTY"
+            exit 1
+          fi
+          if [ -z "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" ]; then
+            echo "ANDROID_KEYSTORE_PASSWORD is EMPTY"
+            exit 1
+          fi
+          if [ -z "${{ secrets.ANDROID_KEY_PASSWORD }}" ]; then
+            echo "ANDROID_KEY_PASSWORD is EMPTY"
+            exit 1
+          fi
+          echo "All signing secrets are present."
+
       - name: Sign APK
-        uses: ilharp/sign-android-release@v1
+        if: github.event_name != 'pull_request'
+        uses: ilharp/sign-android-release@v2
         id: sign_app
+        continue-on-error: true
         with:
           releaseDir: android/app/build/outputs/apk/release
-          signingKey: ${{ secrets.SIGNING_KEY }}
-          alias: ${{ secrets.ALIAS }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
+          signingKey: ${{ secrets.ANDROID_SIGNING_KEY }}
+          keyAlias: ${{ secrets.ANDROID_KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
       - name: Upload Debug APK
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: audiovisual-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
 
-      - name: Upload Release APK
+      - name: Upload Release APK (unsigned)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: audiovisual-release-apk
+          name: audiovisual-release-unsigned-apk
           path: android/app/build/outputs/apk/release/app-release-unsigned.apk
 
       - name: Upload Signed APK
