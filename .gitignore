@@ -86,3 +86,5 @@ typings/
 # Development configuration
 dev-app-update.ymlaudiovisual-release.jks
 android_signing_key_base64.txt
+audiovisual-release.jks
+android_signing_key_base64.txt
