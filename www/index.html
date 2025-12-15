@@ -2,11 +2,11 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>AudioVisual</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/toastify.min.css">
-    <link rel="stylesheet" id="drama-theme" href="assets/css/drama-style.css" disabled>
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <link rel="stylesheet" href="./assets/css/toastify.min.css">
+    <link rel="stylesheet" id="drama-theme" href="./assets/css/drama-style.css" disabled>
 </head>
 <body>
     <div class="container">
@@ -118,7 +118,7 @@
                 </div>
             </div>
         </aside>
-        
+
         <main class="main-content">
             <div class="top-bar">
                 <div class="browser-controls">
@@ -146,6 +146,7 @@
                     </button>
                 </div>
             </div>
+
             <div id="youku-custom-page" style="display: none;">
                 <div class="icon-container">
                     <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -168,50 +169,41 @@
             </div>
         </main>
     </div>
+
     <div id="loading-overlay" class="hidden">
         <div class="spinner"></div>
     </div>
+
     <script src="./assets/js/toastify.min.js"></script>
     <script src="./assets/js/renderer.js"></script>
-    <script type="module">
-        // Capacitor 初始化代码
-        import { Capacitor } from '@capacitor/core';
-        import { Browser } from '@capacitor/browser';
-        
-        // 如果在 Android 环境中运行，替换部分 Electron API
-        if (Capacitor.getPlatform() === 'android') {
-            // 替换 Electron 的窗口控制函数
-            window.voidAPI = window.voidAPI || {};
-            
-            window.voidAPI.minimizeWindow = () => {
-                console.log('Minimize window called');
-            };
-            
-            window.voidAPI.maximizeWindow = () => {
-                console.log('Maximize window called');
-            };
-            
-            window.voidAPI.closeWindow = () => {
-                console.log('Close window called');
-            };
-            
-            window.voidAPI.openExternalLink = async (url) => {
-                await Browser.open({ url });
-            };
-            
-            // 导航相关函数
-            window.voidAPI.goBack = () => {
-                window.history.back();
-            };
-            
-            window.voidAPI.goForward = () => {
-                window.history.forward();
-            };
-            
-            window.voidAPI.navigate = (url) => {
-                window.location.href = url;
-            };
+
+    <!-- ✅ 重要：不要用 type="module" + import '@capacitor/...'，静态页面会直接白屏 -->
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const Cap = window.Capacitor;
+        if (!Cap || !Cap.getPlatform) return;
+
+        if (Cap.getPlatform() === 'android') {
+          // 在 Android 环境中运行：替换 Electron API
+          window.voidAPI = window.voidAPI || {};
+
+          window.voidAPI.minimizeWindow = () => console.log('Minimize window called');
+          window.voidAPI.maximizeWindow = () => console.log('Maximize window called');
+          window.voidAPI.closeWindow = () => console.log('Close window called');
+
+          window.voidAPI.openExternalLink = async (url) => {
+            if (Cap.Plugins && Cap.Plugins.Browser) {
+              await Cap.Plugins.Browser.open({ url });
+            } else {
+              window.location.href = url;
+            }
+          };
+
+          window.voidAPI.goBack = () => window.history.back();
+          window.voidAPI.goForward = () => window.history.forward();
+          window.voidAPI.navigate = (url) => (window.location.href = url);
         }
+      });
     </script>
 </body>
 </html>

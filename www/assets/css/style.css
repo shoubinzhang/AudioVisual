@@ -539,3 +539,37 @@ select:focus {
         padding-top: 10px;
     }
 }
+/* ===== Mobile responsive patch ===== */
+@media (max-width: 768px) {
+  .container {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .sidebar {
+    width: 100%;
+    position: relative;
+    height: auto;
+  }
+
+  .main-content {
+    width: 100%;
+    height: auto;
+  }
+
+  .top-bar {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  #url-input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .window-controls {
+    display: none; /* 手机不需要最小化/最大化/关闭按钮 */
+  }
+}

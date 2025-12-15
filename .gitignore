@@ -84,4 +84,5 @@ typings/
 #package-lock.json
 
 # Development configuration
-dev-app-update.yml
+dev-app-update.ymlaudiovisual-release.jks
+android_signing_key_base64.txt
