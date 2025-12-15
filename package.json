@@ -9,7 +9,11 @@
     "dist:win": "electron-builder --win",
     "dist:mac": "electron-builder --mac",
     "dist:linux": "electron-builder --linux",
-    "dist:all": "electron-builder --win --mac --linux"
+    "dist:all": "electron-builder --win --mac --linux",
+    "add-android": "npx cap add android",
+    "build-android": "npx cap build android",
+    "open-android": "npx cap open android",
+    "prepare-android": "node scripts/prepare-android.js"
   },
   "author": {
     "name": "AudioVisual",
@@ -19,11 +23,15 @@
   "devDependencies": {
     "electron": "^33.0.0",
     "electron-builder": "^25.1.8",
-    "electron-updater": "^6.6.2"
+    "electron-updater": "^6.6.2",
+    "@capacitor/cli": "^6.0.0"
   },
   "dependencies": {
     "axios": "^1.4.0",
-    "electron-updater": "^6.6.2"
+    "electron-updater": "^6.6.2",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/browser": "^6.0.0"
   },
   "build": {
     "appId": "com.void.player",

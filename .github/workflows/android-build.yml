@@ -1,0 +1,70 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [created]
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Install Capacitor CLI
+      run: npm install @capacitor/cli @capacitor/android
+      
+    - name: Add Android platform
+      run: npx cap add android
+      
+    - name: Copy assets
+      run: npx cap copy
+      
+    - name: Build Android APK
+      run: |
+        cd android
+        chmod +x gradlew
+        ./gradlew assembleDebug
+        ./gradlew assembleRelease
+        
+    - name: Sign APK
+      uses: ilharp/sign-android-release@v1
+      id: sign_app
+      with:
+        releaseDir: android/app/build/outputs/apk/release
+        signingKey: ${{ secrets.SIGNING_KEY }}
+        alias: ${{ secrets.ALIAS }}
+        keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+        keyPassword: ${{ secrets.KEY_PASSWORD }}
+      
+    - name: Upload Debug APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: audiovisual-debug-apk
+        path: android/app/build/outputs/apk/debug/app-debug.apk
+        
+    - name: Upload Release APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: audiovisual-release-apk
+        path: android/app/build/outputs/apk/release/app-release-unsigned.apk
+        
+    - name: Upload Signed APK
+      if: steps.sign_app.outputs.signedFile != null
+      uses: actions/upload-artifact@v3
+      with:
+        name: audiovisual-signed-apk
+        path: ${{ steps.sign_app.outputs.signedFile }}

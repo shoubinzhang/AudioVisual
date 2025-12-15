@@ -126,6 +126,63 @@ npm run dist
 
 ---
 
+## 📱 Android 打包
+
+### 🏗️ 使用 GitHub Actions 自动构建
+
+本项目支持通过 GitHub Actions 自动构建 Android APK，即使您无法下载 Android Studio。
+
+1. 将项目推送到 GitHub
+2. GitHub Actions 会自动构建 Android APK
+3. 在 Actions 页面下载生成的 APK 文件
+
+### ▶️ 手动构建步骤
+
+如果您希望手动构建 Android APK，可以按照以下步骤操作：
+
+1. 安装 Capacitor:
+   ```bash
+   npm install @capacitor/core @capacitor/cli
+   npm install @capacitor/android
+   ```
+
+2. 添加 Android 平台:
+   ```bash
+   npx cap add android
+   ```
+
+3. 构建项目:
+   ```bash
+   npx cap build android
+   ```
+
+### 📺 小米电视安装说明
+
+1. 将生成的 APK 文件传输到 U 盘
+2. 将 U 盘插入小米电视的 USB 接口
+3. 在小米电视上打开文件管理器
+4. 找到 APK 文件并安装
+5. 如果出现"未知来源"警告，请在设置中启用"允许未知来源应用"
+
+### 🎨 图标要求
+
+为确保应用在各种设备上有良好的视觉效果，请参考 [ANDROID_ICONS.md](ANDROID_ICONS.md) 文件了解图标规格要求。
+
+### 🔐 应用签名
+
+发布到商店的应用需要进行数字签名。GitHub Actions 工作流已配置了签名步骤，您需要在仓库设置中添加以下密钥：
+
+- `SIGNING_KEY`: 签名密钥文件（base64 编码）
+- `ALIAS`: 密钥别名
+- `KEY_STORE_PASSWORD`: 密钥库密码
+- `KEY_PASSWORD`: 密钥密码
+
+### 🌐 在线构建选项
+
+如果您无法在本地安装 Android Studio，请查看 [ONLINE_ANDROID_BUILD.md](ONLINE_ANDROID_BUILD.md) 文件了解多种在线构建方法。
+
+---
+
 ## 🤝 贡献指南
 
 欢迎提交 Issue 和 Pull Request！

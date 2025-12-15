@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AudioVisual</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/toastify.min.css">
@@ -172,5 +173,45 @@
     </div>
     <script src="./assets/js/toastify.min.js"></script>
     <script src="./assets/js/renderer.js"></script>
+    <script type="module">
+        // Capacitor 初始化代码
+        import { Capacitor } from '@capacitor/core';
+        import { Browser } from '@capacitor/browser';
+        
+        // 如果在 Android 环境中运行，替换部分 Electron API
+        if (Capacitor.getPlatform() === 'android') {
+            // 替换 Electron 的窗口控制函数
+            window.voidAPI = window.voidAPI || {};
+            
+            window.voidAPI.minimizeWindow = () => {
+                console.log('Minimize window called');
+            };
+            
+            window.voidAPI.maximizeWindow = () => {
+                console.log('Maximize window called');
+            };
+            
+            window.voidAPI.closeWindow = () => {
+                console.log('Close window called');
+            };
+            
+            window.voidAPI.openExternalLink = async (url) => {
+                await Browser.open({ url });
+            };
+            
+            // 导航相关函数
+            window.voidAPI.goBack = () => {
+                window.history.back();
+            };
+            
+            window.voidAPI.goForward = () => {
+                window.history.forward();
+            };
+            
+            window.voidAPI.navigate = (url) => {
+                window.location.href = url;
+            };
+        }
+    </script>
 </body>
 </html>
